@@ -1,5 +1,5 @@
 # Advent-of-Code-2022
 
-``` bash
+```Shell
 cargo run --bin day03
 ```
