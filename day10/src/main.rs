@@ -1,9 +1,48 @@
 use std::fs;
 
 fn signal_strengths(input_str: String) -> i32 {
-    return 0;
+    let milestones = vec![20, 60, 100, 140, 180, 220, -1];
+    let mut milestone_idx = 0;
+    let mut register_x = 1;
+    let mut sum_signal_strengths = 0;
+    let mut cycle_count = 1;
+    for instruction in input_str.split("\n") {
+        let ms = milestones[milestone_idx];
+        match instruction {
+            "noop" => {
+                cycle_count += 1;
+                if cycle_count == ms {
+                    sum_signal_strengths += ms * register_x;
+                    milestone_idx += 1;
+                }
+            }
+            add_instruction => {
+                cycle_count += 1;
+                if cycle_count == ms {
+                    sum_signal_strengths += ms * register_x;
+                    milestone_idx += 1;
+                }
+
+                let delta = add_instruction
+                    .split(" ")
+                    .skip(1)
+                    .next()
+                    .unwrap()
+                    .parse::<i32>()
+                    .unwrap();
+                register_x += delta;
+                cycle_count += 1;
+                if cycle_count == ms {
+                    sum_signal_strengths += ms * register_x;
+                    milestone_idx += 1;
+                }
+            }
+        }
+    }
+    return sum_signal_strengths;
 }
 
+#[test]
 fn test_signal_strengths() {
     let str = "addx 15
 addx -11
@@ -155,5 +194,7 @@ noop";
 }
 
 fn main() {
-    println!("Hello, world!");
+    let input_str = fs::read_to_string("day10/input.txt").unwrap();
+    let strengths = signal_strengths(input_str.to_string());
+    println!("first puzzle {}", strengths);
 }
