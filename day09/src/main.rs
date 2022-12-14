@@ -1,6 +1,6 @@
 use std::fs;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 struct Point {
     row: i32,
     col: i32,
@@ -107,10 +107,80 @@ R 2";
     assert_eq!(res, 13);
 }
 
+fn second_visited(input_str: String) -> i32 {
+    let size = 1000;
+    let mut map = vec![vec![0; size]; size];
+
+    let center = (size / 2) as i32;
+    map[center as usize][center as usize] = 1;
+    let mut knots = vec![
+        Point {
+            row: center,
+            col: center
+        };
+        10
+    ];
+
+    for m in input_str.split("\n") {
+        let mut parts = m.split(" ");
+        let dir = parts.next().unwrap();
+        let count = parts.next().unwrap().parse::<i32>().unwrap();
+        for _ in 0..count {
+            match dir {
+                "U" => {
+                    knots[0].row -= 1;
+                }
+                "D" => {
+                    knots[0].row += 1;
+                }
+                "L" => {
+                    knots[0].col -= 1;
+                }
+                "R" => {
+                    knots[0].col += 1;
+                }
+                _ => {}
+            }
+            for i in 1..10 {
+                let res = move_tail(&knots[i - 1], &knots[i]);
+                match res {
+                    None => {}
+                    new_tail => {
+                        knots[i] = new_tail.unwrap();
+                        if knots[i].row < 0 || knots[i].col < 0 {
+                            panic!("a haha");
+                        }
+                    }
+                }
+            }
+            map[knots[9].row as usize][knots[9].col as usize] = 1;
+        }
+    }
+
+    let count = map
+        .iter()
+        .fold(0, |acc, vs| acc + vs.iter().fold(0, |ac, v| ac + v));
+
+    return count;
+}
+
+#[test]
+fn test_second_visited() {
+    let input = "R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20";
+    let res = second_visited(input.to_string());
+    assert_eq!(res, 36);
+}
+
 fn main() {
     let moves_str = fs::read_to_string("day09/input.txt").unwrap();
 
-    let count = visited(moves_str);
-
-    println!("first puzzle {}", count);
+    // println!("first puzzle {}", visited(moves_str));
+    println!("second puzzle {}", second_visited(moves_str));
 }
